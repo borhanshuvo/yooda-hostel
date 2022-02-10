@@ -1,8 +1,8 @@
-import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
 import { useHistory, useLocation } from "react-router-dom";
+import { toast } from "react-toastify";
+import SingleFood from "./SingleFood";
 
 const ManageFood = () => {
   const headingColor = { color: "#3A4256" };
@@ -39,6 +39,39 @@ const ManageFood = () => {
     history.push(`/manageStudent?page=${page.selected + 1}`);
   };
 
+  const onSubmitEdit = (data) => {
+    fetch(
+      `${process.env.REACT_APP_API_URL}/foodItem/updateFoodItem/${data.id}`,
+      {
+        method: "PUT",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          name: data.name,
+          price: data.price,
+        }),
+      }
+    )
+      .then((res) => res.json())
+      .then((result) => {
+        toast.success(result.success);
+        setNumber((prevState) => prevState + 1);
+      });
+  };
+
+  const deleteFoodItem = (id) => {
+    fetch(`${process.env.REACT_APP_API_URL}/foodItem/deleteFoodItem/${id}`, {
+      method: "DELETE",
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        toast.success(result.success);
+        const newFoodsData = foodsData.filter(
+          (foodData) => foodData._id !== id
+        );
+        setFoodsData(newFoodsData);
+      });
+  };
+
   return (
     <div>
       <h4 className="pt-3 pb-5 ps-3" style={headingColor}>
@@ -57,32 +90,15 @@ const ManageFood = () => {
             </thead>
             <tbody>
               {foodsData.map((foodData, index) => (
-                <tr key={foodData._id}>
-                  <td>{serial + index + 1}</td>
-                  <td>{foodData.name}</td>
-                  <td>{foodData.price}</td>
-                  <td>
-                    <button
-                      style={{ border: "none" }}
-                      //   onClick={() => deleteService(service._id)}
-                    >
-                      <FontAwesomeIcon
-                        style={{ color: "blue" }}
-                        icon={faEdit}
-                      />
-                    </button>
-                    |
-                    <button
-                      style={{ border: "none" }}
-                      //   onClick={() => deleteService(service._id)}
-                    >
-                      <FontAwesomeIcon
-                        style={{ color: "red" }}
-                        icon={faTrash}
-                      />
-                    </button>
-                  </td>
-                </tr>
+                <SingleFood
+                  key={foodData._id}
+                  serial={serial}
+                  setNumber={setNumber}
+                  onSubmitEdit={onSubmitEdit}
+                  foodData={foodData}
+                  index={index}
+                  deleteFoodItem={deleteFoodItem}
+                />
               ))}
             </tbody>
           </table>

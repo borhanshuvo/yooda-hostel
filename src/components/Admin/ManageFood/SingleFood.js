@@ -1,65 +1,31 @@
 import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useState } from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "react-toastify";
 
-const SingleStudent = ({
-  studentData,
+const SingleFood = ({
+  foodData,
   index,
+  deleteFoodItem,
   serial,
+  onSubmitEdit,
   setNumber,
-  deleteStudent,
-  onSubmitStudentEdit,
 }) => {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const [status, setStatus] = useState(studentData?.status);
-  const updateStatus = (val, id) => {
-    fetch(`${process.env.REACT_APP_API_URL}/student/updateStudent/${id}`, {
-      method: "PUT",
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({ status: val }),
-    })
-      .then((res) => res.json())
-      .then((result) => {
-        toast.success("Status changed Successfully!");
-        setNumber((prevState) => prevState + 1);
-      });
-  };
-
   return (
     <tr>
       <td>{serial + index + 1}</td>
-      <td>{studentData?.fullName}</td>
-      <td>{studentData?.roll}</td>
-      <td>{studentData?.age}</td>
-      <td>{studentData?.class}</td>
-      <td>{studentData?.hallName}</td>
-      <td>{studentData?.status}</td>
-      <td>
-        <input
-          type="checkbox"
-          defaultChecked={status === "inActive" ? false : true}
-          onChange={() => {
-            setStatus(status === "inActive" ? "active" : "inActive");
-            updateStatus(
-              status === "inActive" ? "active" : "inActive",
-              studentData?._id
-            );
-          }}
-        />
-      </td>
+      <td>{foodData.name}</td>
+      <td>{foodData.price}</td>
       <td>
         <button
           style={{ border: "none" }}
           data-bs-toggle="modal"
-          data-bs-target={`#studentDataEdit${studentData._id}`}
+          data-bs-target={`#dataEdit${foodData._id}`}
         >
           <FontAwesomeIcon style={{ color: "blue" }} icon={faEdit} />
         </button>
@@ -67,14 +33,14 @@ const SingleStudent = ({
         <button
           style={{ border: "none" }}
           data-bs-toggle="modal"
-          data-bs-target={`#studentDataDelete${index + 1}`}
+          data-bs-target={`#dataDelete${index + 1}`}
         >
           <FontAwesomeIcon style={{ color: "red" }} icon={faTrash} />
         </button>
       </td>
       <div
         className="modal fade text-start"
-        id={`studentDataEdit${studentData._id}`}
+        id={`dataEdit${foodData._id}`}
         tabIndex="-1"
         aria-labelledby="exampleModalLabel"
         aria-hidden="true"
@@ -83,7 +49,7 @@ const SingleStudent = ({
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title" id="exampleModalLabel">
-                EDIT - {studentData.fullName}
+                EDIT - {foodData.name}
               </h5>
               <button
                 type="button"
@@ -94,67 +60,28 @@ const SingleStudent = ({
             </div>
 
             <div className="modal-body">
-              <form onSubmit={handleSubmit(onSubmitStudentEdit)}>
+              <form onSubmit={handleSubmit(onSubmitEdit)}>
                 <div className="form-group">
-                  <label htmlFor="fullName">Full Name</label>
+                  <label htmlFor="name">Food Name</label>
                   <input
                     type="text"
-                    defaultValue={studentData.fullName}
-                    {...register("fullName")}
-                    name="fullName"
-                    id="fullName"
+                    defaultValue={foodData.name}
+                    {...register("name")}
+                    name="name"
+                    id="name"
                     autoComplete="off"
                     className="form-control"
                   />
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="roll">Roll</label>
+                  <label htmlFor="price">Price</label>
                   <input
                     type="text"
-                    defaultValue={studentData.roll}
-                    {...register("roll")}
-                    name="roll"
-                    id="roll"
-                    autoComplete="off"
-                    className="form-control"
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="age">Age</label>
-                  <input
-                    type="text"
-                    defaultValue={studentData.age}
-                    {...register("age")}
-                    name="age"
-                    id="age"
-                    autoComplete="off"
-                    className="form-control"
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="class">Class</label>
-                  <input
-                    type="text"
-                    defaultValue={studentData.class}
-                    {...register("class")}
-                    name="class"
-                    id="class"
-                    autoComplete="off"
-                    className="form-control"
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="hallName">Hall Name</label>
-                  <input
-                    type="text"
-                    defaultValue={studentData.hallName}
-                    {...register("hallName")}
-                    name="hallName"
-                    id="hallName"
+                    defaultValue={foodData.price}
+                    {...register("price")}
+                    name="price"
+                    id="price"
                     autoComplete="off"
                     className="form-control"
                   />
@@ -162,7 +89,7 @@ const SingleStudent = ({
 
                 <input
                   type="id"
-                  defaultValue={studentData._id}
+                  defaultValue={foodData._id}
                   {...register("id")}
                   name="id"
                   id="id"
@@ -185,7 +112,7 @@ const SingleStudent = ({
       </div>
       <div
         className="modal fade"
-        id={`studentDataDelete${index + 1}`}
+        id={`dataDelete${index + 1}`}
         tabIndex="-1"
         aria-labelledby="exampleModalLabel"
         aria-hidden="true"
@@ -194,7 +121,7 @@ const SingleStudent = ({
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title" id="exampleModalLabel">
-                DELETE - {studentData?.fullName}
+                DELETE - {foodData?.name}
               </h5>
               <button
                 type="button"
@@ -211,7 +138,7 @@ const SingleStudent = ({
                 type="button"
                 className="btn btn-danger"
                 data-bs-dismiss="modal"
-                onClick={() => deleteStudent(studentData._id)}
+                onClick={() => deleteFoodItem(foodData._id)}
               >
                 Yes
               </button>
@@ -230,4 +157,4 @@ const SingleStudent = ({
   );
 };
 
-export default SingleStudent;
+export default SingleFood;
